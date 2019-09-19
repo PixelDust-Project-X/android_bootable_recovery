@@ -93,15 +93,12 @@ static std::string BrowseDirectory(const std::string& path, Device* device, Reco
     if (chosen_item == static_cast<size_t>(RecoveryUI::KeyError::INTERRUPTED)) {
       return "";
     }
-    if (chosen_item == Device::kGoHome) {
-      return "@";
-    }
-    if (chosen_item == Device::kGoBack || chosen_item == 0) {
-      // Go up but continue browsing (if the caller is browse_directory).
-      return "";
-    }
 
     const std::string& item = entries[chosen_item];
+    if (chosen_item == 0) {
+      // Go up but continue browsing (if the caller is BrowseDirectory).
+      return "";
+    }
 
     std::string new_path = path + "/" + item;
     if (new_path.back() == '/') {
@@ -195,9 +192,6 @@ int ApplyFromSdcard(Device* device, RecoveryUI* ui) {
   }
 
   std::string path = BrowseDirectory(SDCARD_ROOT, device, ui);
-  if (path == "@") {
-    return INSTALL_NONE;
-  }
   if (path.empty()) {
     LOG(ERROR) << "\n-- No package file selected.\n";
     ensure_path_unmounted(SDCARD_ROOT);
